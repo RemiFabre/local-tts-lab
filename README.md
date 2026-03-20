@@ -12,6 +12,7 @@ This first pass includes:
 - an initial recommendation and ranked shortlist
 - a realistic benchmark plan for local evaluation
 - a multi-backend CLI for `say`, Kokoro, MeloTTS, and Piper
+- a warm Kokoro daemon plus a `kokoro-say` command for repeat shell usage
 - bring-up notes plus helper scripts for local smoke tests and compare runs
 
 ## Quick start
@@ -20,6 +21,8 @@ This first pass includes:
 cd /Users/remi/local-tts-lab
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python -m local_tts_lab.cli doctor
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python -m local_tts_lab.cli backends
+PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/local-tts kokoro-daemon start
+PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/kokoro-say "Hello from warm Kokoro."
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python -m local_tts_lab.cli compare-suite
 ```
 
@@ -29,6 +32,7 @@ If you want the installed script:
 cd /Users/remi/local-tts-lab
 python3 -m pip install -e .
 PYTORCH_ENABLE_MPS_FALLBACK=1 local-tts compare-suite
+kokoro-say "Bonjour depuis Kokoro."
 local-tts play-compare --lang en
 ```
 
@@ -67,6 +71,7 @@ The Melo helper creates a dedicated Python 3.11 environment in `.venv-melo` beca
 - `docs/benchmarks/2026-03-20-first-compare-suite.md`
 - `docs/runbooks/next-steps.md`
 - `docs/runbooks/kokoro-bringup-2026-03-20.md`
+- `docs/runbooks/kokoro-daemon-2026-03-20.md`
 - `docs/runbooks/melo-bringup-2026-03-20.md`
 
 ## Near-term intent
@@ -84,3 +89,4 @@ The planned first benchmark wave is:
 - Cloud APIs may appear only as external comparison points, not dependencies.
 - Runtime artifacts live under `runtime/` and are ignored by git by default.
 - The latest compare suite currently writes EN/FR outputs and a `summary.tsv` under `runtime/outputs/compare/`.
+- The warm Kokoro daemon keeps one shared model plus English and French pipelines resident in RAM.
