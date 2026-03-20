@@ -12,6 +12,7 @@ This first pass includes:
 - an initial recommendation and ranked shortlist
 - a realistic benchmark plan for local evaluation
 - a minimal CLI entry point that already wraps macOS `say`
+- a Kokoro bring-up note plus helper scripts for local smoke tests
 
 ## Quick start
 
@@ -52,6 +53,7 @@ local-tts speak "Hello from the local TTS lab."
 - `docs/research/2026-03-20-apple-silicon-local-tts-first-pass.md`
 - `docs/benchmarks/benchmark-plan.md`
 - `docs/runbooks/next-steps.md`
+- `docs/runbooks/kokoro-bringup-2026-03-20.md`
 
 ## Near-term intent
 
