@@ -26,23 +26,23 @@ Identify the strongest local text-to-speech contenders for Apple Silicon macOS, 
 If we only benchmark a small first wave, the highest-value set is:
 
 1. `say` as the built-in control
-2. Piper as the practical open baseline
-3. Kokoro-82M as the likely quality/speed sweet spot
-4. XTTS-v2 if voice cloning matters immediately
-5. OuteTTS 1.0 or Chatterbox Multilingual as the frontier slot
+2. Kokoro-82M as the most likely high-quality, low-drama fit
+3. Qwen3-TTS as the ambitious high-quality multilingual bet
+4. MeloTTS as the practical fixed-voice EN/FR backup
+5. Piper as the boring-but-reliable baseline if we still want one
 
 My recommendation for the first three open-model benchmarks is:
 
-1. Piper
-2. Kokoro-82M
-3. OuteTTS 1.0-0.6B
+1. Kokoro-82M
+2. MeloTTS
+3. Qwen3-TTS
 
-If zero-shot voice cloning is a must in phase 1, replace OuteTTS with XTTS-v2.
+If you want to push quality upward after that, add a larger Qwen3-TTS variant next.
 
 Qwen3-TTS should also be on the board, but not as a first default for this repo:
 
 - it is clearly a serious frontier contender
-- it supports French, voice cloning, and instruction control
+- it supports French, instruction control, and nice built-in voices
 - but the official local path is much more CUDA / FlashAttention / vLLM flavored than Apple Silicon flavored
 
 ## Ranked shortlist
@@ -50,62 +50,65 @@ Qwen3-TTS should also be on the board, but not as a first default for this repo:
 | Rank | Contender | Why test early | Main caution |
 | --- | --- | --- | --- |
 | Control | macOS `say` | Instant local baseline, best cold-start control, trivial CLI use | Not the open-model target architecture |
-| 1 | Piper | Best practical open baseline for local scripting and robotics | Less expressive than newer frontier models |
-| 2 | Kokoro-82M | Strong quality/speed balance, explicit Apple Silicon MPS note, French support | French voice set is thin |
-| 3 | OuteTTS 1.0-0.6B | Interesting Apple Silicon-native frontier path via llama.cpp Metal | More tuning-sensitive and less battle-tested |
-| 4 | XTTS-v2 | Strong multilingual voice cloning reference point | Heavier stack, non-standard model license, older codepath |
-| 5 | Qwen3-TTS 0.6B Base | Strong new multilingual cloning/control family under Apache-2.0 | Official local docs are CUDA/FlashAttention-first, not Mac-first |
-| 6 | Chatterbox Multilingual | Very interesting recent family for agent-like speech and cloning | Apple Silicon support is inferred, not first-class in docs |
-| 7 | MeloTTS | Practical multilingual fallback with CLI and MPS path | Feels older and less frontier than Kokoro/Piper |
+| 1 | Kokoro-82M | Best blend of quality, Mac fit, and built-in English/French voices | French voice inventory is thin |
+| 2 | Qwen3-TTS | High-end multilingual quality path with instruction control and better voice options | Official local docs are CUDA/FlashAttention-first, not Mac-first |
+| 3 | MeloTTS | Practical fixed-voice EN/FR option with simple CLI and MPS path | Less exciting than Kokoro or Qwen3-TTS |
+| 4 | Piper | Reliability baseline for shell and robotics usage | Quality is not the main reason to choose it |
+| 5 | Chatterbox Multilingual | Interesting quality/expressiveness candidate with French support | Apple Silicon support is inferred, not first-class in docs |
+| 6 | OuteTTS 1.0-0.6B | Interesting Apple Silicon-native frontier path via llama.cpp Metal | Better aligned with speaker-reference workflows than fixed-voice quality testing |
+| 7 | XTTS-v2 | Strong multilingual reference if cloning becomes important later | Heavier stack, non-standard model license, and cloning is no longer a priority |
 | 8 | F5-TTS | Hype-worthy quality/cloning research target | Official story is strongest for EN/ZH, weights are non-commercial |
 | Watchlist | Parler-TTS Mini | Fully open, documented Apple Silicon MPS path, stylish prompting | English-only, so not a first-wave fit for this project |
 
 ## Recommendations
 
-### Best practical baseline: Piper
+### Best first benchmark: Kokoro-82M
 
 Why:
 
-- simplest open local mental model
-- broad multilingual coverage, including English and French
-- good shell/Python ergonomics
-- well aligned with agent and robotics use where reliability beats theatrical expressiveness
+- strongest match to the new priority stack
+- very likely to sound good immediately
+- explicit Apple Silicon note in the official repo
+- enough built-in English voices plus one usable French voice to answer the "few nice voices" requirement
 
 Tradeoff:
 
-- it is usually not the most natural or most expressive option
-- per-call CLI usage reloads the voice model unless we keep a server or long-lived worker alive
+- French coverage is thinner than English
+- if you decide you want richer voice design later, a larger model family may still beat it
 
-### Best quality option: Kokoro-82M
+### Best bigger quality bet: Qwen3-TTS
 
 Why:
 
-- strongest apparent quality-per-byte option in this set
-- explicit Apple Silicon acceleration note in the official repo
-- tiny by modern TTS standards
-- easy to wrap in Python
+- it moves up a lot under the new priorities
+- multilingual, including English and French
+- built-in custom voices and voice-design variants are more relevant than cloning now
+- you have enough RAM that the larger footprints are no longer disqualifying
 
 Tradeoff:
 
-- predefined voices, not true zero-shot voice cloning
-- French exists, but the official voice inventory is much thinner than English
+- the official fast path is still much more NVIDIA-oriented than Apple-Silicon-oriented
+- I would treat this as a quality experiment, not as the first thing to operationalize
 
-### Most interesting frontier / experimental option: OuteTTS 1.0-0.6B
+### Best safe multilingual backup: MeloTTS
 
 Why:
 
-- explicit Apple Silicon / Metal install path
-- multilingual, including French
-- multiple backends, including llama.cpp and Transformers
-- LLM-style TTS architecture makes it strategically interesting for local-agent experimentation
+- fixed English and French voices
+- simple CLI and Python API
+- official docs explicitly mention `mps`
+- good candidate if Kokoro is great in English but disappoints in French
 
 Tradeoff:
 
-- not the safest "just works" pick
-- speaker-reference quality matters a lot
-- official speed data is GPU-centric, so Mac expectations still need real measurement
+- it is more of a practical backup than a frontier quality swing
+- it may not be the winner, but it is a smart comparison point
 
-Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, but its Apple Silicon path is less explicitly documented than OuteTTS's Metal route.
+Models I would now deprioritize for phase 1:
+
+- XTTS-v2, because cloning is no longer central
+- OuteTTS, because its default path is more speaker-reference-centric
+- Piper, except as a pragmatic baseline
 
 ## Recent / hyped / new contenders to call out explicitly
 
@@ -426,7 +429,8 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
 
 - Model / runtime:
   - Qwen3-TTS family
-  - especially `Qwen3-TTS-12Hz-0.6B-Base` if we test locally on a Mac first
+  - for the new priorities, `Qwen3-TTS-12Hz-0.6B-CustomVoice` is the most attractive first Qwen variant
+  - `Qwen3-TTS-12Hz-1.7B-VoiceDesign` is the most interesting bigger follow-up if the smaller test looks promising
 - License:
   - Apache-2.0
 - Runs locally on macOS / Apple Silicon:
@@ -470,7 +474,8 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
   - medium for first deployment because the local Mac path is not as boring-and-reliable yet
 - Notes:
   - if we specifically want the most modern open multilingual cloning family, this is one of the top contenders
-  - for this repo, I would test the 0.6B base before the 1.7B models
+  - for this repo, I would now test a CustomVoice model before the Base cloning model
+  - if quality matters more than convenience and the Mac can tolerate it, the 1.7B VoiceDesign variant is worth serious consideration
   - the third-party project [andimarafioti/faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts) is worth knowing about, but it is explicitly a CUDA-graph acceleration layer that requires an NVIDIA GPU with CUDA, so it is not a practical Apple Silicon path for this repo
 - Official links:
   - Repo: [QwenLM/Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)
@@ -546,25 +551,25 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
 ### First-wave benchmark order
 
 1. macOS `say`
-2. Piper
-3. Kokoro-82M
-4. XTTS-v2
-5. OuteTTS 1.0-0.6B
+2. Kokoro-82M
+3. MeloTTS
+4. Qwen3-TTS
+5. Piper
 
 ### Why this order
 
 - `say` gives us the built-in control for cold-start behavior and CLI ergonomics.
-- Piper gives us the maintainable open baseline.
-- Kokoro gives us the likely best quality/speed sweet spot.
-- XTTS-v2 gives us the "do we actually need cloning?" answer using a mature multilingual baseline.
-- OuteTTS gives us the most interesting Apple Silicon frontier path.
-- Qwen3-TTS is powerful enough to merit a benchmark soon after that, but not before we have a stable baseline on this Mac.
+- Kokoro is now the best immediate quality fit.
+- MeloTTS gives us a straightforward EN/FR comparison with fixed voices.
+- Qwen3-TTS is the first larger-quality experiment worth trying once the basic path is stable.
+- Piper is no longer the star, but it is still useful as a reliability reference.
 
 ### Second-wave candidates
 
 - Chatterbox Multilingual
-- Qwen3-TTS 0.6B Base
-- MeloTTS
+- Qwen3-TTS 1.7B VoiceDesign
+- OuteTTS 1.0
+- XTTS-v2
 - F5-TTS
 - Parler-TTS Mini
 
@@ -572,15 +577,14 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
 
 If the goal is to ship a usable local system quickly:
 
-- start building around Piper
-- benchmark Kokoro as the likely upgrade path for nicer speech
+- start with Kokoro
+- keep MeloTTS as the first practical EN/FR comparison
 - keep macOS `say` as the fallback backend
 
 If the goal is to probe the frontier:
 
-- add OuteTTS next
-- add Qwen3-TTS 0.6B if we want a stronger multilingual cloning / instruction-control comparison
-- add XTTS-v2 if cloned voice identity becomes important
+- add Qwen3-TTS next
+- only go to the larger Qwen variant if the smaller one is promising on this Mac
 
 If the goal shifts toward expressive voice-agent behavior:
 

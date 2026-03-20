@@ -26,18 +26,19 @@ Run mostly autonomous local benchmarks on Apple Silicon macOS that compare:
 ### Phase 1 runners
 
 - macOS `say`
-- Piper
 - Kokoro-82M
+- MeloTTS
 
 ### Phase 2 runners
 
-- XTTS-v2
-- OuteTTS 1.0-0.6B
+- Qwen3-TTS
+- Piper
 
 ### Phase 3 runners
 
+- XTTS-v2
+- OuteTTS 1.0-0.6B
 - Chatterbox Multilingual
-- MeloTTS
 - F5-TTS
 
 ## Test corpus
@@ -91,9 +92,9 @@ Method:
 
 Also capture pairwise preference:
 
-- Piper vs Kokoro
-- Kokoro vs frontier model
-- Practical baseline vs cloning baseline
+- Kokoro vs MeloTTS
+- Kokoro vs Qwen3-TTS
+- fixed-voice baseline vs larger frontier model
 
 ### 2. Intelligibility
 
@@ -257,17 +258,18 @@ For subjective review:
 ## Recommended first autonomous sequence
 
 1. Implement adapters for `say`, Piper, and Kokoro.
+1. Implement adapters for `say`, Kokoro, and MeloTTS.
 2. Create a small EN/FR benchmark corpus.
 3. Run cold and warm synthesis tests for all three.
 4. Generate a listening pack for manual review.
-5. Add XTTS-v2 next if cloning still looks important.
-6. Add OuteTTS after that as the frontier path.
+5. Add Qwen3-TTS next if the fixed-voice baselines are promising.
+6. Add XTTS-v2 or OuteTTS only if later priorities change.
 
 ## Success criteria for phase 1
 
 We should be able to answer:
 
-- Is Kokoro clearly better than Piper on this machine?
+- Is Kokoro clearly better than MeloTTS for the English/French quality target?
 - Is the quality gap large enough to justify extra setup?
 - Is `say` still valuable as a fallback backend?
-- Do we need cloning soon enough to justify XTTS-v2 in the first implementation wave?
+- Is Qwen3-TTS worth its extra complexity on this Mac once we hear Kokoro and MeloTTS?
