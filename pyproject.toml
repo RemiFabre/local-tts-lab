@@ -15,6 +15,7 @@ dependencies = []
 
 [project.scripts]
 local-tts = "local_tts_lab.cli:main"
+kokoro-say = "local_tts_lab.kokoro_service:kokoro_say_main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

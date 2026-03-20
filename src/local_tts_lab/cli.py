@@ -19,6 +19,8 @@ from local_tts_lab.backends import (
     synthesize,
     warm_import_note,
 )
+from local_tts_lab.kokoro_service import daemon_main as kokoro_daemon_main
+from local_tts_lab.kokoro_service import kokoro_say_main as kokoro_say_main
 from local_tts_lab.paths import COMPARE_DIR, OUTPUTS_DIR, ensure_runtime_dirs, latest_compare_root
 from local_tts_lab.presets import DEFAULT_VOICES, SAMPLE_TEXTS
 
@@ -99,6 +101,20 @@ def build_parser() -> argparse.ArgumentParser:
     install = subparsers.add_parser("install", help="Install helper assets for one backend.")
     install.add_argument("target", choices=["piper-voices"], help="Install target.")
     install.set_defaults(func=run_install)
+
+    kokoro_daemon = subparsers.add_parser(
+        "kokoro-daemon",
+        help="Manage the warm Kokoro daemon used by kokoro-say.",
+    )
+    kokoro_daemon.add_argument("daemon_args", nargs=argparse.REMAINDER)
+    kokoro_daemon.set_defaults(func=run_kokoro_daemon)
+
+    kokoro_say = subparsers.add_parser(
+        "kokoro-say",
+        help="Speak text through the warm Kokoro daemon.",
+    )
+    kokoro_say.add_argument("say_args", nargs=argparse.REMAINDER)
+    kokoro_say.set_defaults(func=run_kokoro_say)
 
     play_compare = subparsers.add_parser(
         "play-compare",
@@ -217,6 +233,18 @@ def run_install(args: argparse.Namespace) -> int:
             print(f"downloaded={voice_name}")
         return 0
     return 1
+
+
+def run_kokoro_daemon(args: argparse.Namespace) -> int:
+    daemon_args = args.daemon_args or ["status"]
+    return kokoro_daemon_main(daemon_args)
+
+
+def run_kokoro_say(args: argparse.Namespace) -> int:
+    say_args = args.say_args
+    if say_args and say_args[0] == "--":
+        say_args = say_args[1:]
+    return kokoro_say_main(say_args)
 
 
 def run_play_compare(args: argparse.Namespace) -> int:
