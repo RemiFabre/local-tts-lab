@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.pyc
+*.pyo
+*.pyd
+
+runtime/cache/*
+!runtime/cache/.gitkeep
+runtime/models/*
+!runtime/models/.gitkeep
+runtime/outputs/*
+!runtime/outputs/.gitkeep
