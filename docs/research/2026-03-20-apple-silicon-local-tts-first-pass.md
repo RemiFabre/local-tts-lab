@@ -471,6 +471,7 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
 - Notes:
   - if we specifically want the most modern open multilingual cloning family, this is one of the top contenders
   - for this repo, I would test the 0.6B base before the 1.7B models
+  - the third-party project [andimarafioti/faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts) is worth knowing about, but it is explicitly a CUDA-graph acceleration layer that requires an NVIDIA GPU with CUDA, so it is not a practical Apple Silicon path for this repo
 - Official links:
   - Repo: [QwenLM/Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)
   - Hugging Face collection: [Qwen3-TTS collection](https://huggingface.co/collections/Qwen/qwen3-tts-688a697f81f2d8010430c328)
