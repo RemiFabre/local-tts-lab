@@ -2,7 +2,7 @@
 
 Local-first text-to-speech research and benchmarking for Apple Silicon macOS.
 
-This repository is focused on a simple question: what should we run locally on a Mac when we want robust, scriptable speech for coding agents and robotics experiments?
+This repository is focused on a simple question: what should we run locally on a Mac when we want high-quality, scriptable speech for coding agents and robotics experiments?
 
 ## Current status
 
@@ -58,9 +58,9 @@ local-tts speak "Hello from the local TTS lab."
 The planned first benchmark wave is:
 
 1. macOS `say` as the built-in control
-2. Piper as the practical open baseline
-3. Kokoro-82M as the likely quality/speed sweet spot
-4. Chatterbox Multilingual or OuteTTS as the frontier candidate
+2. Kokoro-82M as the first quality-first benchmark
+3. MeloTTS as the practical English/French comparison
+4. Qwen3-TTS as the larger quality experiment
 
 ## Notes
 
