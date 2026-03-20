@@ -39,6 +39,12 @@ My recommendation for the first three open-model benchmarks is:
 
 If zero-shot voice cloning is a must in phase 1, replace OuteTTS with XTTS-v2.
 
+Qwen3-TTS should also be on the board, but not as a first default for this repo:
+
+- it is clearly a serious frontier contender
+- it supports French, voice cloning, and instruction control
+- but the official local path is much more CUDA / FlashAttention / vLLM flavored than Apple Silicon flavored
+
 ## Ranked shortlist
 
 | Rank | Contender | Why test early | Main caution |
@@ -48,9 +54,10 @@ If zero-shot voice cloning is a must in phase 1, replace OuteTTS with XTTS-v2.
 | 2 | Kokoro-82M | Strong quality/speed balance, explicit Apple Silicon MPS note, French support | French voice set is thin |
 | 3 | OuteTTS 1.0-0.6B | Interesting Apple Silicon-native frontier path via llama.cpp Metal | More tuning-sensitive and less battle-tested |
 | 4 | XTTS-v2 | Strong multilingual voice cloning reference point | Heavier stack, non-standard model license, older codepath |
-| 5 | Chatterbox Multilingual | Very interesting recent family for agent-like speech and cloning | Apple Silicon support is inferred, not first-class in docs |
-| 6 | MeloTTS | Practical multilingual fallback with CLI and MPS path | Feels older and less frontier than Kokoro/Piper |
-| 7 | F5-TTS | Hype-worthy quality/cloning research target | Official story is strongest for EN/ZH, weights are non-commercial |
+| 5 | Qwen3-TTS 0.6B Base | Strong new multilingual cloning/control family under Apache-2.0 | Official local docs are CUDA/FlashAttention-first, not Mac-first |
+| 6 | Chatterbox Multilingual | Very interesting recent family for agent-like speech and cloning | Apple Silicon support is inferred, not first-class in docs |
+| 7 | MeloTTS | Practical multilingual fallback with CLI and MPS path | Feels older and less frontier than Kokoro/Piper |
+| 8 | F5-TTS | Hype-worthy quality/cloning research target | Official story is strongest for EN/ZH, weights are non-commercial |
 | Watchlist | Parler-TTS Mini | Fully open, documented Apple Silicon MPS path, stylish prompting | English-only, so not a first-wave fit for this project |
 
 ## Recommendations
@@ -104,6 +111,7 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
 
 - Chatterbox family: repo created on 2025-04-23; current family includes Turbo (350M), Multilingual (500M), and the original English model. Very worth watching for agent-like speech generation.
 - OuteTTS 1.0: model card created on 2025-05-18. Interesting because it pairs modern LLM tooling with local TTS and explicitly supports Apple Silicon / Metal installs.
+- Qwen3-TTS: released by Qwen on 2026-01-22 in 0.6B and 1.7B variants. Very important to watch because it combines multilingual support, 3-second cloning, streaming support, and instruction control under Apache-2.0.
 - F5-TTS v1 base: announced in the official repo on 2025-03-12. Still one of the most talked-about open voice-cloning style TTS lines, but it is not the cleanest fit for an English/French-first Mac benchmark.
 - Kokoro v1.0: published on 2025-01-27. It moved very quickly from "small interesting model" to "serious practical contender."
 
@@ -414,7 +422,64 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
   - Oute model org: [OuteAI on Hugging Face](https://huggingface.co/OuteAI)
   - Docs: [interface usage guide](https://github.com/edwko/OuteTTS/blob/main/docs/interface_usage.md)
 
-### 8. F5-TTS
+### 8. Qwen3-TTS
+
+- Model / runtime:
+  - Qwen3-TTS family
+  - especially `Qwen3-TTS-12Hz-0.6B-Base` if we test locally on a Mac first
+- License:
+  - Apache-2.0
+- Runs locally on macOS / Apple Silicon:
+  - Local use is clearly supported
+  - Apple Silicon support is inferred rather than explicitly documented
+  - official examples and optimization guidance are CUDA / FlashAttention 2 first
+- Runtime / backend:
+  - `qwen-tts` Python package
+  - Transformers-based Python API
+  - official local web UI demo
+  - vLLM-Omni support is also called out
+- Approximate model size / RAM:
+  - `Qwen3-TTS-12Hz-0.6B-Base` model file is about 1.83 GB
+  - `Qwen3-TTS-12Hz-1.7B-Base` model file is about 3.86 GB
+  - actual repo storage is larger because the speech tokenizer assets are separate
+- Quality strengths:
+  - very strong paper-level feature set
+  - multilingual, including English and French
+  - 3-second rapid voice cloning
+  - instruction-driven voice control on the higher-end variants
+  - explicit streaming capability in the model family
+- Quality weaknesses:
+  - operational story is more GPU-centric than Mac-centric
+  - likely heavier and more finicky on Apple Silicon than Piper, Kokoro, or even OuteTTS
+  - if we do not need cloning or instruction control, it is probably overkill for phase 1
+- Speed / latency:
+  - official README emphasizes extreme low-latency streaming and cites latency as low as 97 ms
+  - this is a family capability claim, not an Apple Silicon local benchmark
+- Multilingual support:
+  - 10 major languages including English and French
+- Voice cloning / speaker conditioning:
+  - yes; base models support 3-second rapid voice clone
+  - custom-voice and voice-design variants add stronger control features
+- Ease of local scripting / CLI integration:
+  - medium to good
+  - Python API is real, but the simplest happy path is less lightweight than Piper or Kokoro
+- Agent fit:
+  - high if we care about cloning, instruction control, or future streaming
+- Robotics fit:
+  - medium to high for research
+  - medium for first deployment because the local Mac path is not as boring-and-reliable yet
+- Notes:
+  - if we specifically want the most modern open multilingual cloning family, this is one of the top contenders
+  - for this repo, I would test the 0.6B base before the 1.7B models
+- Official links:
+  - Repo: [QwenLM/Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)
+  - Hugging Face collection: [Qwen3-TTS collection](https://huggingface.co/collections/Qwen/qwen3-tts-688a697f81f2d8010430c328)
+  - 0.6B base model: [Qwen/Qwen3-TTS-12Hz-0.6B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-Base)
+  - 1.7B base model: [Qwen/Qwen3-TTS-12Hz-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base)
+  - Technical report: [arXiv 2601.15621](https://arxiv.org/abs/2601.15621)
+  - Blog: [Qwen3-TTS blog](https://qwen.ai/blog?id=qwen3tts-0115)
+
+### 9. F5-TTS
 
 - Model / runtime:
   - F5-TTS v1 base
@@ -492,10 +557,12 @@ Close runner-up: Chatterbox Multilingual. It is more obviously agent-oriented, b
 - Kokoro gives us the likely best quality/speed sweet spot.
 - XTTS-v2 gives us the "do we actually need cloning?" answer using a mature multilingual baseline.
 - OuteTTS gives us the most interesting Apple Silicon frontier path.
+- Qwen3-TTS is powerful enough to merit a benchmark soon after that, but not before we have a stable baseline on this Mac.
 
 ### Second-wave candidates
 
 - Chatterbox Multilingual
+- Qwen3-TTS 0.6B Base
 - MeloTTS
 - F5-TTS
 - Parler-TTS Mini
@@ -511,6 +578,7 @@ If the goal is to ship a usable local system quickly:
 If the goal is to probe the frontier:
 
 - add OuteTTS next
+- add Qwen3-TTS 0.6B if we want a stronger multilingual cloning / instruction-control comparison
 - add XTTS-v2 if cloned voice identity becomes important
 
 If the goal shifts toward expressive voice-agent behavior:
@@ -545,6 +613,10 @@ If the goal shifts toward expressive voice-agent behavior:
 - [MeloTTS install docs](https://github.com/myshell-ai/MeloTTS/blob/main/docs/install.md)
 - [SWivid/F5-TTS](https://github.com/SWivid/F5-TTS)
 - [SWivid/F5-TTS model card](https://huggingface.co/SWivid/F5-TTS)
+- [QwenLM/Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)
+- [Qwen3-TTS collection](https://huggingface.co/collections/Qwen/qwen3-tts-688a697f81f2d8010430c328)
+- [Qwen/Qwen3-TTS-12Hz-0.6B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-Base)
+- [Qwen/Qwen3-TTS-12Hz-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base)
 - [huggingface/parler-tts](https://github.com/huggingface/parler-tts)
 - [parler-tts/parler-tts-mini-v1](https://huggingface.co/parler-tts/parler-tts-mini-v1)
 
@@ -552,6 +624,7 @@ If the goal shifts toward expressive voice-agent behavior:
 
 - [Natural language guidance of high-fidelity text-to-speech with synthetic annotations](https://arxiv.org/abs/2402.01912)
 - [F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching](https://arxiv.org/abs/2410.06885)
+- [Qwen3-TTS Technical Report](https://arxiv.org/abs/2601.15621)
 - [StyleTTS 2](https://arxiv.org/abs/2306.07691)
 
 ## Confidence notes
@@ -560,6 +633,7 @@ If the goal shifts toward expressive voice-agent behavior:
   - Piper, Kokoro, XTTS-v2, MeloTTS, Parler-TTS source-backed facts
 - Medium confidence:
   - Apple Silicon practical behavior for XTTS-v2 and Chatterbox
+  - Apple Silicon practical behavior for Qwen3-TTS
   - exact warm-path latency expectations for OuteTTS and Chatterbox on a Mac
 - Low confidence until we benchmark locally:
   - whether Chatterbox Multilingual beats OuteTTS for this exact machine and workflow
