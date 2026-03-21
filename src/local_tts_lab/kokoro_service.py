@@ -30,6 +30,10 @@ from local_tts_lab.presets import DEFAULT_VOICES
 DEFAULT_REPO_ID = "hexgrad/Kokoro-82M"
 DEFAULT_SPEED = 1.0
 LANG_TO_CODE = {"en": "a", "fr": "f"}
+LANG_VOICE_PREFIXES = {
+    "en": ("af_", "am_", "bf_", "bm_"),
+    "fr": ("ff_", "fm_"),
+}
 
 
 def rss_mb() -> float:
@@ -69,6 +73,37 @@ def choose_device() -> str:
     if torch.cuda.is_available():
         return "cuda"
     return "cpu"
+
+
+def repo_voice_ids() -> list[str]:
+    from huggingface_hub import list_repo_files
+
+    files = list_repo_files(DEFAULT_REPO_ID, repo_type="model")
+    return sorted({path.split("/")[-1][:-3] for path in files if path.startswith("voices/") and path.endswith(".pt")})
+
+
+def cached_voice_ids() -> list[str]:
+    cache_root = Path.home() / ".cache" / "huggingface" / "hub" / "models--hexgrad--Kokoro-82M" / "snapshots"
+    if not cache_root.exists():
+        return []
+    snapshots = sorted(path for path in cache_root.iterdir() if path.is_dir())
+    if not snapshots:
+        return []
+    voice_dir = snapshots[-1] / "voices"
+    if not voice_dir.exists():
+        return []
+    return sorted({path.stem for path in voice_dir.glob("*.pt")})
+
+
+def list_available_voices(language: str | None = None) -> list[str]:
+    try:
+        voices = repo_voice_ids()
+    except Exception:
+        voices = cached_voice_ids()
+    if language is None:
+        return voices
+    prefixes = LANG_VOICE_PREFIXES[language]
+    return [voice for voice in voices if voice.startswith(prefixes)]
 
 
 @dataclass
@@ -390,6 +425,7 @@ def build_kokoro_say_parser() -> argparse.ArgumentParser:
     parser.add_argument("text", nargs="*", help="Text to speak. Reads stdin when omitted.")
     parser.add_argument("--lang", default="en", choices=["en", "fr"], help="Language preset.")
     parser.add_argument("--voice", help="Optional Kokoro voice override.")
+    parser.add_argument("--list-voices", action="store_true", help="List available Kokoro voices for the chosen language.")
     parser.add_argument("--speed", type=float, default=DEFAULT_SPEED, help="Speech speed.")
     parser.add_argument("--output", type=Path, help="Optional wav output path.")
     parser.add_argument("--no-play", action="store_true", help="Generate audio without playing it.")
@@ -400,8 +436,12 @@ def build_kokoro_say_parser() -> argparse.ArgumentParser:
 def kokoro_say_main(argv: list[str] | None = None) -> int:
     parser = build_kokoro_say_parser()
     args = parser.parse_args(argv)
+    if args.list_voices:
+        for voice in list_available_voices(args.lang):
+            print(voice)
+        return 0
     text = read_text_arg(args.text)
-    status = ensure_service_running()
+    ensure_service_running()
 
     ephemeral = args.output is None and not args.no_play
     output_path = args.output or default_live_output(args.lang)
