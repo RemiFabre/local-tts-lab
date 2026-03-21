@@ -21,6 +21,7 @@ This first pass includes:
 cd /Users/remi/local-tts-lab
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python -m local_tts_lab.cli doctor
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python -m local_tts_lab.cli backends
+PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/kokoro-say --lang en --list-voices
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/local-tts kokoro-daemon start
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/kokoro-say "Hello from warm Kokoro."
 PYTORCH_ENABLE_MPS_FALLBACK=1 .venv/bin/python -m local_tts_lab.cli compare-suite
@@ -43,6 +44,8 @@ cd /Users/remi/local-tts-lab
 scripts/setup/install_kokoro.sh
 .venv/bin/local-tts install piper-voices
 scripts/setup/install_melo.sh
+scripts/experiments/run_kokoro_english_voices.sh
+scripts/experiments/run_kokoro_french_voices.sh
 ```
 
 The Melo helper creates a dedicated Python 3.11 environment in `.venv-melo` because its dependency set is less happy on Python 3.12.
@@ -72,6 +75,7 @@ The Melo helper creates a dedicated Python 3.11 environment in `.venv-melo` beca
 - `docs/runbooks/next-steps.md`
 - `docs/runbooks/kokoro-bringup-2026-03-20.md`
 - `docs/runbooks/kokoro-daemon-2026-03-20.md`
+- `docs/runbooks/kokoro-voice-sweeps-2026-03-21.md`
 - `docs/runbooks/melo-bringup-2026-03-20.md`
 
 ## Near-term intent
